@@ -18,7 +18,8 @@ const doctorSchema = new mongoose.Schema({
     },
     email:{
         type:String,
-        required:[true , "Email is reqired"]
+        required:[true , "Email is reqired"],
+        unique : true
     },
     website:{
         type:String

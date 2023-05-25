@@ -32,6 +32,7 @@ const Notification = () => {
         dispatch(hideloading())
         if(res.data.success){
             message.success(res.data.message)
+            window.location.reload()
         }
         else{
             message.error(res.data.message)
@@ -59,6 +60,7 @@ const Notification = () => {
             dispatch(hideloading())
         if(res.data.success){
             message.success(res.data.message)
+            window.location.reload()
         }
         else{
             message.error(res.data.message)
