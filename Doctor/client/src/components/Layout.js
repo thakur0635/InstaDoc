@@ -5,16 +5,44 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Badge, message } from 'antd'
 const Layout = ({ children }) => {
+    const { user } = useSelector(state => state.user)
     const navigate = useNavigate()
+    
+
+
+
+    const doctorMenu = [
+        {
+            name : "Home",
+            path : "/",
+            icon : "fa-sharp fa-solid fa-house"
+        },
+        {
+            name : "Appointments",
+            path : "/appointments",
+            icon : "fa-solid fa-list"
+        },
+        
+        {
+            name : "Profile",
+            path : `/doctor/profile/${user?._id}`,
+            icon : "fa-solid fa-user"
+        },
+        
+    ]
+
+
+
+
 
     const location = useLocation()
-    const { user } = useSelector(state => state.user)
+
     const handleLogout = () => {
         localStorage.clear()
         message.success("Logged out successfully")
         navigate("/login")
     }
-    const SidebarMenu = user?.isAdmin ? adminMenu : userMenu
+    const SidebarMenu = user?.isAdmin ? adminMenu : user?.isDoctor ? doctorMenu : userMenu
 
     return (
         <>

@@ -2,6 +2,11 @@ const userModel = require("../models/user")
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const doctorModel = require("../models/doctor")
+const appointmentModel = require('../models/appointmentModel')
+const moment = require('moment')
+
+
+
 
 
 const registerController = async (req, res) => {
@@ -140,6 +145,8 @@ const getAllNotificationcontroller = async (req , res) =>{
 }
 
 
+
+
 const deleteAllNotificationcontroller = async(req , res) =>{
     try{
         const user = await userModel.findOne({_id : req.body.userId})
@@ -163,4 +170,106 @@ const deleteAllNotificationcontroller = async(req , res) =>{
 }
 
 
-module.exports = { loginController, registerController, authcontroller, applyDoctorcontroller , getAllNotificationcontroller , deleteAllNotificationcontroller }
+const getALLDoctorsController = async (req , res) => {
+    try{
+        const doctors = await doctorModel.find({status : "approved"})
+        res.status(200).send({
+            success : true,
+            message : "fetched data successfully",
+            data : doctors
+        })
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "Error in fetching doctors",
+            error
+        })
+    }
+}
+
+const bookAppointmentController = async (req , res) => {
+    try{
+        req.body.date =moment(req.body.date,"DD-MM-YYYY").toISOString()
+        req.body.time =moment(req.body.time,"HH-mm").toISOString()
+
+        const newAppointment = new appointmentModel(req.body)
+        await newAppointment.save()
+        const user = await userModel.findOne({_id : req.body.doctorInfo.userId})
+        user.notification.push({
+            type : 'New Appointment request',
+            message : `A new appointment request from ${req.body.userInfo.name}`,
+            onClickPath : '/user/appointments'
+        })
+        await user.save()
+        res.status(201).send({
+            success : true,
+            message : 'Appointment booked suuccessfully',
+
+        })
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "Error in booking appointment",
+            error
+        })
+    }
+}
+
+
+const bookingAvailabilityController = async (req , res) => {
+    try{
+        const date = moment(req.body.date , "DD-MM-YYYY").toISOString()
+        const fromTime = moment(req.body.time,"HH-mm").subtract(1 , "hours")
+        const toTime = moment(req.body.time,"HH-mm").add(1 , "hours")
+        const doctorId  =req.body.doctorId
+        const appointments = await appointmentModel.find({
+            doctorId,
+            date,
+            time:{
+                $gte: fromTime,
+                $lte:toTime
+            }
+        })
+        if(appointments.length > 0)
+        return res.status(200).send({success:false,message:"Appointments not available"})
+        else
+        return res.status(200).send({success:true,message:"Appointments  available"})
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "Error in checking appointment",
+            error
+        })
+    }
+}
+
+
+const userAppointmentController = async (req , res) => {
+    try{
+        const appointments = await appointmentModel.find({userId : req.body.userId})
+        res.status(200).send({
+            success  :true , 
+            message :  "FEtched dara successfully",
+            data : appointments
+        })
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).send({
+            success : false,
+            message : "Error in fetching appointment",
+            error
+        })
+    }
+}
+
+
+module.exports = { loginController, registerController, authcontroller, applyDoctorcontroller , getAllNotificationcontroller 
+    , deleteAllNotificationcontroller ,getALLDoctorsController , bookAppointmentController ,bookingAvailabilityController ,
+     userAppointmentController }

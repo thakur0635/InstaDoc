@@ -10,6 +10,9 @@ import ApplyDoctor from './pages/ApplyDoctor';
 import Notification from './pages/Notification';
 import Doctors from './pages/admin/Doctors';
 import Users from './pages/admin/Users';
+import Profile from './pages/doctor/Profile';
+import Bookingpage from './pages/Bookingpage';
+import Appointment from './pages/Appointment';
 
 
 
@@ -29,6 +32,12 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Homepage />
+                </ProtectedRoute>}
+            />
+            <Route path='/appointments'
+              element={
+                <ProtectedRoute>
+                  <Appointment />
                 </ProtectedRoute>}
             />
             <Route path='/apply-doctor'
@@ -53,6 +62,18 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Users />
+                </ProtectedRoute>}
+            />
+            <Route path='/doctor/profile/:id'
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>}
+            />
+            <Route path='/doctor/book-appointment/:doctorId'
+              element={
+                <ProtectedRoute>
+                  <Bookingpage />
                 </ProtectedRoute>}
             />
             <Route path='/login' element={
